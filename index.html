@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ruta PMP</title>
+<meta name="theme-color" content="#14262e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ruta PMP">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Mismo formato que Ruta de Estudio Refinería: una columna de lectura, barra de bloques fija arriba, cada semana es una fila marcable. */
+:root{
+  --bg:#eef1f2; --surface:#ffffff; --ink:#14262e; --muted:#566b74; --line:#cfd8dc;
+  --accent:#b8590f; --accent-soft:#f6e6d6; --done:#1c7a6b; --done-soft:#dcefeb; --warn:#a33a2b;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1b20; --surface:#17272e; --ink:#e6eef0; --muted:#9ab0b8; --line:#2c424b;
+    --accent:#f0a35a; --accent-soft:#3a2a1a; --done:#55c2ae; --done-soft:#173832; --warn:#f08a78;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:.01em}
+h1{font-size:30px;font-weight:700;text-transform:uppercase}
+h2{font-size:26px;font-weight:600}
+h3{font-size:20px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
+p{margin:0}
+.wrap{max-width:760px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left)) 0 max(16px,env(safe-area-inset-right))}
+header.top{padding:calc(env(safe-area-inset-top) + 20px) 0 12px}
+.topline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.sub{color:var(--muted);font-size:14px;margin-top:4px}
+.sync{font-size:12px;font-family:var(--mono);padding:4px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted);white-space:nowrap}
+.sync.ok{color:var(--done);border-color:var(--done)}
+.sync.off{color:var(--warn);border-color:var(--warn)}
+.global{margin-top:14px}
+.gnums{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--muted)}
+.gnums b{font-family:var(--display);font-size:34px;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.segs{display:flex;gap:3px;margin-top:6px}
+.seg{height:12px;background:var(--line);border-radius:2px;overflow:hidden;position:relative}
+.seg i{position:absolute;inset:0 auto 0 0;background:var(--done);width:0;transition:width .25s}
+.seglabels{display:flex;gap:3px;margin-top:4px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabrow{display:flex;gap:4px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
+.tabrow::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;font-family:var(--display);font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;color:var(--muted);padding:8px 12px;border-radius:4px;border:1px solid transparent}
+.tab[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding:20px 0 calc(env(safe-area-inset-bottom) + 64px);display:flex;flex-direction:column;gap:24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.next{border-left:5px solid var(--accent)}
+.eyebrow{font-family:var(--mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.btn{display:inline-block;font-family:var(--display);font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;background:var(--accent);color:var(--surface);border:0;border-radius:4px;padding:9px 14px;text-decoration:none;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+.row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+label.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);flex:1 1 130px;min-width:0}
+input[type=date],input[type=number],input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;min-height:42px;width:100%;-webkit-appearance:none;appearance:none}
+.pace{font-size:15px}
+.pace b{color:var(--ink)}
+.blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+a.bcard{text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:8px}
+.bcard .tag{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.bcard .name{font-family:var(--display);font-size:22px;font-weight:600;line-height:1.1}
+.bar{height:8px;background:var(--line);border-radius:2px;overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:var(--done);width:0;transition:width .25s}
+.bar u{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;gap:8px}
+.pill{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:3px;background:var(--accent-soft);color:var(--accent)}
+.pill.done{background:var(--done-soft);color:var(--done)}
+.mix{display:flex;height:28px;border-radius:4px;overflow:hidden;font-family:var(--mono);font-size:12px}
+.mix span{display:flex;align-items:center;justify-content:center;color:var(--surface)}
+.mix .a{width:50%;background:var(--ink)} .mix .b{width:30%;background:var(--muted)} .mix .c{width:20%;background:var(--accent)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.books{color:var(--muted);font-size:15px}
+.weeks{display:flex;flex-direction:column}
+.week{display:grid;grid-template-columns:auto auto 1fr;gap:4px 12px;padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
+.week:first-child{border-top:0}
+.week input,.check input{width:22px;height:22px;accent-color:var(--done);margin:2px 0 0;cursor:pointer;flex:none}
+.wk{font-family:var(--mono);font-size:13px;color:var(--muted);padding-top:3px;min-width:28px}
+.wbody{display:flex;flex-direction:column;gap:6px;min-width:0}
+.wtitle{font-weight:600;font-size:17px}
+.wstudy{font-size:15px;color:var(--muted)}
+.wprob{font-size:15px;border-left:3px solid var(--accent);padding-left:10px}
+.wprob small{display:block;font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.week.on .wtitle{color:var(--done)}
+.week.on .wk{color:var(--done)}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:6px 0}
+.check.on span{color:var(--done)}
+.deliv{border:2px solid var(--accent)}
+.deliv.on{border-color:var(--done);background:var(--done-soft)}
+textarea{width:100%;min-height:110px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:10px;resize:vertical}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+/* añadidos para PMP: puntos clave, práctica y apoyo */
+details.kp{border-top:1px solid var(--line)}
+details.kp:first-child{border-top:0}
+details.kp summary{list-style:none;cursor:pointer;padding:12px 0;font-weight:600;font-size:16px;display:flex;justify-content:space-between;gap:12px}
+details.kp summary::-webkit-details-marker{display:none}
+details.kp summary::after{content:"+";font-family:var(--mono);color:var(--accent)}
+details.kp[open] summary::after{content:"−"}
+details.kp ul{margin:0 0 12px;font-size:15px;color:var(--muted)}
+.dom{display:flex;flex-direction:column;gap:4px}
+.dom .meta b{color:var(--ink);font-family:var(--mono)}
+.good{color:var(--done)!important}.low{color:var(--warn)!important}.mid{color:var(--accent)!important}
+.ses{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.ses:first-child{border-top:0}
+.ses .g{flex:1;min-width:0}
+.ses .d{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.ses b.p{font-family:var(--mono);font-size:14px}
+.x{background:none;border:0;color:var(--muted);font-size:22px;line-height:1;padding:6px 8px;cursor:pointer}
+table.f{width:100%;border-collapse:collapse;font-size:15px}
+table.f td{padding:8px 4px;border-top:1px solid var(--line);vertical-align:top}
+table.f tr:first-child td{border-top:0}
+table.f td:first-child{font-family:var(--mono);font-size:13px;white-space:nowrap;color:var(--accent)}
+table.f small{display:block;color:var(--muted);font-size:13px}
+svg.tr{width:100%;height:120px;display:block}
+.err{color:var(--warn);font-size:14px;min-height:0}
+@media (prefers-reduced-motion: reduce){.seg i,.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="topline">
+      <div>
+        <h1>Ruta PMP</h1>
+        <p class="sub">Preparación para el examen PMP: 5 bloques, 12 semanas, el temario ECO de julio de 2026 como hilo conductor.</p>
+      </div>
+      <span id="sync" class="sync off">Guardado en este dispositivo</span>
+    </div>
+    <div class="global">
+      <div class="gnums"><span><b id="gdone">0</b> de <span id="gtotal">17</span> hitos</span><span id="gpct">0 %</span></div>
+      <div class="segs" id="segs"></div>
+      <div class="seglabels" id="seglabels"></div>
+    </div>
+  </header>
+</div>
+<nav class="tabs" aria-label="Secciones"><div class="wrap"><div class="tabrow" id="tabs"></div></div></nav>
+<div class="wrap"><main id="main"></main></div>
+
+<script>
+"use strict";
+var VERSION = "2.0.0", LS_KEY = "rutaPMP", SCHEMA = 2, TARGET = 75, PACE_S = 80;
+
+var BLOCKS = [
+ {id:"b1", n:1, name:"Fundamentos y ágil", dur:"2 semanas", dom:"",
+  goal:"Fija el vocabulario de PMI y la mentalidad ágil; el 60 % del examen es ágil o híbrido.",
+  books:"ECO PMP 2026; PMBOK 8 (Estándar y principios); Guía Práctica de Ágil; Guía de Scrum 2020; introducción gratuita al PMP de PMI",
+  probLabel:"Práctica",
+  weeks:[
+   ["Fundamentos y ECO 2026","Lee el ECO completo. Principios y dominios de desempeño del PMBOK 8, sistema de entrega de valor, ciclos de vida predictivo, ágil e híbrido.","Diagnóstico de 50 preguntas y lista de tus proyectos para la solicitud."],
+   ["Ágil e híbrido","Guía Práctica de Ágil y Guía de Scrum: roles, eventos, artefactos, backlog y estimación. Kanban, XP y Lean a nivel de reconocimiento.","Mapa mental de Scrum y 60 preguntas ágiles."]
+  ],
+  deliv:"Diagnóstico inicial registrado en Práctica y lista de proyectos con fechas y meses de experiencia, lista para la solicitud.",
+  checkTitle:"Autoevaluación",
+  checks:["Distingo proyecto, programa, portafolio y operación con un ejemplo de mi trabajo.","Elijo entre predictivo, ágil e híbrido según el escenario y lo justifico.","Describo roles, eventos y artefactos de Scrum sin mirar la guía.","Distingo definición de terminado de criterios de aceptación."]},
+ {id:"b2", n:2, name:"Personas", dur:"2 semanas · 33 %", dom:"P",
+  goal:"Ocho tareas sobre liderar equipos e interesados; se entrena con preguntas situacionales, no con memoria.",
+  books:"PMBOK 8 (dominios de Interesados y Recursos; liderazgo responsable y equipos empoderados); Guía Práctica de Ágil (entorno ágil); Código de Ética de PMI; Mulcahy o Ramdayal",
+  probLabel:"Práctica",
+  weeks:[
+   ["Visión, conflictos, liderazgo e interesados","Tareas 1 a 4: acta de constitución y visión, técnicas de conflicto, Tuckman y motivación, análisis e involucramiento de interesados.","80 preguntas de Personas."],
+   ["Expectativas, conocimiento y comunicación","Tareas 5 a 8: alinear y gestionar expectativas, transferencia de conocimiento, plan y métodos de comunicación.","80 preguntas de Personas y envío de la solicitud a PMI."]
+  ],
+  deliv:"Solicitud enviada a PMI y 60 % o más de aciertos acumulados en Personas.",
+  checkTitle:"Autoevaluación",
+  checks:["Elijo la técnica de conflicto adecuada y sé por qué colaborar es la preferida.","Ajusto mi estilo de liderazgo a la etapa de Tuckman del equipo.","Ubico a un interesado en la matriz de involucramiento y defino cómo moverlo.","Sé cuándo hablar directamente con la persona y cuándo escalar."]},
+ {id:"b3", n:3, name:"Proceso", dur:"4 semanas · 41 %", dom:"PR",
+  goal:"El dominio más grande y el único con cálculos: plan, alcance, cronograma, finanzas, recursos, adquisiciones, calidad y cierre.",
+  books:"PMBOK 8 (dominios de Alcance, Cronograma, Finanzas y Recursos; áreas de enfoque y procesos; adquisiciones); Guía Práctica de Ágil (entrega); Mulcahy o Ramdayal para cálculos",
+  probLabel:"Práctica",
+  weeks:[
+   ["Plan, alcance y valor","Tareas 1 a 3: plan integrado y líneas base, requisitos, EDT y backlog, priorización y entrega incremental.","80 preguntas de Proceso."],
+   ["Cronograma y finanzas","Tareas 8 y 6: dependencias, ruta crítica, holguras y compresión; estimación, reservas y valor ganado.","Hoja de fórmulas escrita de memoria y 40 ejercicios numéricos."],
+   ["Recursos, adquisiciones y calidad","Tareas 4, 5 y 7: RACI y nivelación, tipos de contrato y quién asume el riesgo, costo de la calidad y herramientas.","80 preguntas de Proceso."],
+   ["Estado y cierre","Tareas 9 y 10: análisis de variación y tendencia, lectura de gráficos, aceptación formal y cierre.","Simulacro de medio término: 90 preguntas en 120 minutos. Pagar y agendar el examen."]
+  ],
+  deliv:"Simulacro de medio término con 70 % o más y examen pagado y agendado.",
+  checkTitle:"Autoevaluación",
+  checks:["Calculo e interpreto CPI, SPI y EAC sin mirar la hoja de fórmulas.","Encuentro la ruta crítica y la holgura de una red pequeña.","Digo quién asume el riesgo en precio fijo, costo reembolsable y tiempo y materiales.","Explico por qué controlar la calidad va antes de validar el alcance."]},
+ {id:"b4", n:4, name:"Entorno de negocio", dur:"2 semanas · 26 %", dom:"BE",
+  goal:"El dominio que más creció en 2026: gobernanza, cumplimiento, cambios, riesgo, mejora continua, IA y sostenibilidad.",
+  books:"PMBOK 8 (dominios de Gobernanza y Riesgo; sostenibilidad; contenido sobre IA y PMO); Código de Ética de PMI; cursos gratuitos de IA de PMI; opcional: estándar de riesgos y Managing Change in Organizations",
+  probLabel:"Práctica",
+  weeks:[
+   ["Gobernanza, cumplimiento, cambios e incidentes","Tareas 1 a 4: quién decide qué, umbrales y escalamiento, requisitos de cumplimiento, control integrado de cambios, riesgo frente a incidente.","80 preguntas de Entorno de negocio."],
+   ["Riesgo, mejora, cambio organizacional y entorno","Tareas 5 a 8: respuestas al riesgo y reservas, retrospectivas, ADKAR y Kotter, PESTLE. IA y sostenibilidad en proyectos.","80 preguntas de Entorno de negocio."]
+  ],
+  deliv:"70 % o más de aciertos acumulados en Entorno de negocio sobre al menos 160 preguntas.",
+  checkTitle:"Autoevaluación",
+  checks:["Recorro en orden los pasos del control integrado de cambios.","Nombro las cinco respuestas a amenazas y las cinco a oportunidades.","Distingo reserva de contingencia de reserva de gestión.","Sé qué hacer ante una violación de cumplimiento y ante un cambio externo que afecta el caso de negocio."]},
+ {id:"b5", n:5, name:"Simulación y examen", dur:"2 semanas", dom:"",
+  goal:"Condiciones reales: 180 preguntas, 240 minutos, dos pausas. Se repasa solo lo que los simulacros muestran débil.",
+  books:"PMI Study Hall (versión del examen nuevo) u otro simulador alineado al ECO 2026; tu registro de errores; hoja de fórmulas",
+  probLabel:"Práctica",
+  weeks:[
+   ["Primer simulacro completo","Simulacro 1 de 180 preguntas en 240 minutos. Revisa todas las explicaciones. Practica bloques de casos de estudio y preguntas con gráficos.","Registro de errores por tarea del ECO: concepto, lectura o tiempo."],
+   ["Simulacros finales y examen","Simulacros 2 y 3. Repaso solo de tareas con menos de 70 %. Fórmulas. Descanso dos días antes.","Presentar el examen."]
+  ],
+  deliv:"Dos simulacros completos seguidos con 75 % o más.",
+  checkTitle:"Listo para el examen",
+  checks:["Mantengo un ritmo de 80 segundos por pregunta durante cuatro horas.","Identifico en cada pregunta si el escenario es predictivo, ágil o híbrido.","Mi registro de errores está al día y repasé cada regla.","Tengo documento de identidad vigente y conozco el centro o probé el sistema para el examen en línea."]}
+];
+
+/* puntos clave por tema: [bloque, título, puntos] */
+var KEY = [
+ ["b1","Proyecto, programa, portafolio y PMO",["Proyecto temporal y único; operación continua","Programa: proyectos relacionados para lograr beneficios; portafolio: lo que cumple la estrategia","PMO de apoyo, de control o directiva","A más orientación a proyectos de la organización, más autoridad del director"]],
+ ["b1","Entrega de valor y principios del PMBOK 8",["Cadena estrategia, portafolio, programas, proyectos, operaciones, beneficios","Caso de negocio y plan de beneficios","Seis principios: visión holística, valor, calidad, liderazgo responsable, sostenibilidad, equipos empoderados","Siete dominios: gobernanza, alcance, cronograma, finanzas, interesados, recursos, riesgo"]],
+ ["b1","Enfoques y adaptación",["Predictivo: requisitos estables, cambio costoso","Ágil: incertidumbre alta y retroalimentación frecuente","Híbrido: partes del proyecto de naturaleza distinta","Factores ambientales frente a activos de procesos de la organización"]],
+ ["b1","Scrum",["Sprint de un mes o menos, no se alarga","Diaria de 15 minutos, es del equipo","Product Owner ordena el backlog; Scrum Master facilita y quita impedimentos","El objetivo del sprint no cambia a mitad de camino"]],
+ ["b1","Backlog y estimación",["Historias de usuario (INVEST), épicas, refinamiento, spikes","Puntos de historia, planning poker","La velocidad sirve para planificar, no para comparar equipos","Burndown: trabajo restante; burnup: completado frente al total"]],
+ ["b1","Kanban, XP, Lean e híbrido",["Sistema de arrastre y límites de trabajo en curso","Tiempo de entrega frente a tiempo de ciclo; flujo acumulado","XP: pares, pruebas primero, integración continua","Liderazgo de servicio y equipos autoorganizados"]],
+ ["b2","1. Desarrollar una visión común",["Acta de constitución: propósito, objetivos, hitos, autoridad; la aprueba el patrocinador","En ágil: visión del producto y hoja de ruta con el Product Owner","Acuerdos de equipo creados por el propio equipo","Reunión de inicio para alinear objetivos y roles"]],
+ ["b2","2. Gestionar conflictos",["Fuentes frecuentes: cronogramas, prioridades, recursos","Colaborar (preferida), comprometer, suavizar, forzar, evitar","Primero los involucrados, luego conversación privada, después escalar"]],
+ ["b2","3. Liderar el equipo",["Tuckman: formación, turbulencia, normalización, desempeño, disolución","Liderazgo situacional y de servicio","Maslow, Herzberg, McGregor, McClelland, Vroom","Poder experto y referente primero; coercitivo al final","Inteligencia emocional; equipos virtuales y diversos"]],
+ ["b2","4. Involucrar a los interesados",["Identificación temprana y continua; registro","Matriz poder e interés; modelo de prominencia","Matriz de involucramiento: desconocedor, reticente, neutral, de apoyo, líder"]],
+ ["b2","5. Alinear expectativas",["Criterios de éxito y de aceptación medibles","Pedidos incompatibles: facilitar acuerdo; si persiste decide patrocinador o Product Owner","Negociación basada en intereses"]],
+ ["b2","6. Gestionar expectativas",["Malas noticias pronto, con análisis y opciones","Interesado reticente: entender su preocupación antes de escalar","Demostraciones y revisiones frecuentes"]],
+ ["b2","7. Transferencia de conocimiento",["Lecciones aprendidas durante todo el proyecto","Conocimiento explícito frente a tácito","Mentoría, trabajo conjunto, comunidades de práctica"]],
+ ["b2","8. Comunicación",["Plan: quién necesita qué, cuándo y por qué canal","Interactivo, push y pull; escucha activa","Canales n(n-1)/2","Radiadores de información y cara a cara en ágil"]],
+ ["b3","1. Plan integrado y entrega",["Planes subsidiarios y líneas base de alcance, cronograma y costo","El plan cambia con control de cambios; los documentos se actualizan a diario","Planificación gradual","Ágil: hoja de ruta, plan de liberaciones, plan de iteración"]],
+ ["b3","2. Alcance",["Requisitos: entrevistas, talleres, prototipos; trazabilidad","EDT, paquetes de trabajo, regla del 100 %, diccionario","Controlar calidad va antes de validar el alcance","Corrupción del alcance frente a baño de oro"]],
+ ["b3","3. Entrega basada en valor",["MoSCoW, Kano, valor frente a esfuerzo","Producto mínimo viable y entregas incrementales","VPN, TIR, periodo de recuperación, beneficio-costo","Muchos beneficios se miden después del cierre"]],
+ ["b3","4. Recursos",["RACI: un solo responsable final","Nivelación (puede alargar) frente a suavizado (usa holgura)","Ágil: equipos estables, dedicados, multifuncionales"]],
+ ["b3","5. Adquisiciones",["Hacer o comprar; enunciado del trabajo; RFI, RFP, RFQ","Precio fijo: riesgo del vendedor","Costo reembolsable: riesgo del comprador","Tiempo y materiales: alcance poco claro, corta duración","Controversias: negociar, mediar o arbitrar, litigio al final"]],
+ ["b3","6. Finanzas",["Estimación análoga, paramétrica, ascendente, tres puntos","Línea base = estimaciones + contingencia; presupuesto = línea base + reserva de gestión","Valor ganado: CV, SV, CPI, SPI, EAC, ETC, VAC, TCPI","El costo hundido no cuenta para decidir"]],
+ ["b3","7. Calidad",["Calidad frente a grado","Gestionar calidad (proceso) frente a controlar (entregable)","Prevenir cuesta menos que corregir","Ishikawa, Pareto, diagrama de control, histograma"]],
+ ["b3","8. Cronograma",["FS, SS, FF, SF; adelantos y retrasos","Ruta crítica: camino más largo, holgura cero","Crashing sube costo; ejecución rápida sube riesgo"]],
+ ["b3","9. Evaluar el estado",["Análisis de variación y de tendencia","Causa raíz, luego acción; si toca línea base, solicitud de cambio","Leer curva S, burndown, burnup, flujo acumulado"]],
+ ["b3","10. Cierre",["Aceptación formal, transferencia, cierre de contratos","Informe final, lecciones, archivo, liberar equipo","También se cierra un proyecto cancelado y cada fase"]],
+ ["b4","1. Gobernanza",["Quién decide qué, con qué información y cuándo","Patrocinador, comité directivo, PMO","Puertas de fase: continuar, ajustar o detener","Umbrales de tolerancia y rutas de escalamiento"]],
+ ["b4","2. Cumplimiento",["Requisitos legales, regulatorios, de seguridad, ambientales y de datos","Violación detectada: detener, informar, no ocultar","Ética PMI: responsabilidad, respeto, equidad, honestidad"]],
+ ["b4","3. Cambios",["Identificar, evaluar impacto, solicitar, decide el comité, actualizar, comunicar, implementar","Nunca implementar antes de aprobar","Ágil: va al backlog y prioriza el Product Owner"]],
+ ["b4","4. Impedimentos e incidentes",["Riesgo: aún no ocurre; incidente: ya ocurrió","Registro de incidentes con dueño y fecha","Causa raíz: cinco porqués, Ishikawa"]],
+ ["b4","5. Riesgo",["Apetito, umbral, registro, dueño por riesgo","Cualitativo: probabilidad e impacto; cuantitativo: VME, árbol, Monte Carlo","Amenazas: escalar, evitar, transferir, mitigar, aceptar","Oportunidades: escalar, explotar, compartir, mejorar, aceptar","Contingencia frente a reserva de gestión"]],
+ ["b4","6. Mejora continua",["Retrospectiva con una o dos mejoras concretas","Planificar, hacer, verificar, actuar; Kaizen"]],
+ ["b4","7. Cambio organizacional",["ADKAR, Kotter, Lewin, Bridges","Evaluar cultura y preparación; gestionar resistencia","Sin adopción no hay beneficios"]],
+ ["b4","8. Entorno externo",["PESTLE","Evaluar impacto en caso de negocio, alcance o backlog","Recomendar continuar, ajustar o cancelar"]],
+ ["b4","IA y sostenibilidad",["IA para borradores, estimaciones, riesgos y resúmenes","La responsabilidad es humana: verificar, proteger datos, vigilar sesgos","Triple resultado: personas, planeta, rentabilidad"]],
+ ["b5","Estrategia de examen",["Lee primero la última frase de la pregunta","Descarta dos opciones y decide entre las dos restantes","Los casos de estudio van primero; tras cada pausa no se vuelve atrás","No dejes preguntas en blanco: no hay penalización"]],
+ ["b5","Criterio PMI",["Analiza la causa antes de actuar","Habla con la persona antes de escalar","Predictivo: control de cambios. Ágil: backlog","En ágil el equipo se autoorganiza; el líder facilita","Nunca ocultes información ni saltes cumplimiento o ética"]]
+];
+
+var FORM = [["CV","EV − AC","Negativa: sobre el presupuesto"],["SV","EV − PV","Negativa: atrasado"],["CPI","EV / AC","Menor que 1: sobrecosto"],["SPI","EV / PV","Menor que 1: atraso"],["EAC","BAC / CPI","Si el desempeño actual continúa"],["ETC","EAC − AC","Lo que falta por gastar"],["VAC","BAC − EAC","Negativa: terminará con sobrecosto"],["TCPI","(BAC − EV) / (BAC − AC)","Mayor que 1: hay que mejorar"],["3 puntos","(O + 4M + P) / 6","Valor esperado (beta)"],["Canales","n(n − 1) / 2","n = número de personas"],["VME","Probabilidad × impacto","Se suma por rama del árbol"]];
+var TRAM = ["Crear cuenta en pmi.org","Decidir si tomo la membresía PMI","Listar proyectos de los últimos 10 años y sumar meses","Elegir e iniciar el curso de 35 horas","Guardar el certificado de las 35 horas","Enviar la solicitud a PMI","Solicitud aprobada","Pagar el examen","Agendar con Pearson VUE","Documento de identidad vigente listo"];
+var DOMS = [["P","Personas"],["PR","Proceso"],["BE","Entorno de negocio"],["MX","Mixto / todos"]];
+var TYPES = [["Q","Preguntas"],["S","Simulacro"],["E","Estudio"]];
+
+var state, view = "resumen";
+
+/* ---------- utilidades ---------- */
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function pad(n){return (n<10?"0":"")+n;}
+function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function parse(s){var a=String(s).split("-");return new Date(+a[0],+a[1]-1,+a[2]);}
+function today(){return iso(new Date());}
+function addDays(s,n){var d=parse(s);d.setDate(d.getDate()+n);return iso(d);}
+function diffDays(a,b){return Math.round((parse(b)-parse(a))/86400000);}
+function short(s){var d=parse(s);return d.getDate()+" "+["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"][d.getMonth()];}
+function isDate(s){return typeof s==="string" && /^\d{4}-\d{2}-\d{2}$/.test(s);}
+function nameOf(list,k){for(var i=0;i<list.length;i++) if(list[i][0]===k) return list[i][1]; return "";}
+function hrs(m){return (Math.round(m/6)/10).toString().replace(".",",");}
+
+/* ---------- estado y migración ---------- */
+function blank(){return {schema:SCHEMA, done:{}, notes:{}, start:"", exam:"", goal:11, ses:[]};}
+function clean(o){
+  var s = blank(), k;
+  if(!o || typeof o !== "object") return s;
+  if(o.schema === 1 || (o.weeks && !o.done)) o = fromV1(o);
+  if(o.done && typeof o.done === "object") for(k in o.done) if(o.done[k]) s.done[k] = true;
+  if(o.notes && typeof o.notes === "object") for(k in o.notes) if(typeof o.notes[k] === "string" && o.notes[k]) s.notes[k] = o.notes[k].slice(0,20000);
+  if(isDate(o.start)) s.start = o.start;
+  if(isDate(o.exam)) s.exam = o.exam;
+  var g = parseFloat(o.goal); if(g >= 1 && g <= 60) s.goal = g;
+  if(Array.isArray(o.ses)) o.ses.forEach(function(x){
+    if(!x || !isDate(x.d)) return;
+    var q = Math.max(0,parseInt(x.q,10)||0), ok = Math.min(q,Math.max(0,parseInt(x.ok,10)||0));
+    s.ses.push({id:+x.id||Date.now(), d:x.d, type:nameOf(TYPES,x.type)?x.type:"Q", dom:nameOf(DOMS,x.dom)?x.dom:"MX", min:Math.max(0,parseInt(x.min,10)||0), q:q, ok:ok, note:String(x.note||"").slice(0,80)});
+  });
+  return s;
+}
+/* versión 1 de la app: tareas por semana, estado por tema y notas por tema */
+function fromV1(o){
+  var n = {done:{}, notes:{}, start:o.start, exam:o.exam, goal:o.goal, ses:o.ses};
+  var map = [["b1",1],["b1",2],["b2",1],["b2",2],["b3",1],["b3",2],["b3",3],["b3",4],["b4",1],["b4",2],["b5",1],["b5",2]], cnt = [5,5,5,5,4,4,4,4,5,6,5,6];
+  var w = o.weeks || {};
+  map.forEach(function(m,i){var all = true; for(var j=0;j<cnt[i];j++) if(!w[i+"-"+j]) all = false; if(all) n.done[m[0]+"w"+m[1]] = true;});
+  var t = o.tram || {}; for(var k in t) if(t[k]) n.done["tr"+k.replace(/^t/,"")] = true;
+  var pre = {m0:"b1", m1:"b1", p:"b2", r:"b3", b:"b4"}, on = o.notes || {};
+  for(var id in on){ if(typeof on[id] !== "string" || !on[id]) continue; var b = pre[id.slice(0,2)] || pre[id.charAt(0)] || "b1"; n.notes[b] = (n.notes[b] ? n.notes[b]+"\n" : "") + on[id]; }
+  return n;
+}
+function loadLocal(){try{state = clean(JSON.parse(localStorage.getItem(LS_KEY)));}catch(e){state = blank();}}
+function saveLocal(){try{localStorage.setItem(LS_KEY, JSON.stringify(state));}catch(e){}}
+
+/* ---------- progreso ---------- */
+function milestones(b){var ids=[]; for(var i=0;i<b.weeks.length;i++) ids.push(b.id+"w"+(i+1)); ids.push(b.id+"e"); return ids;}
+function blockStats(b){var ids=milestones(b), d=0; for(var i=0;i<ids.length;i++) if(state.done[ids[i]]) d++; return {done:d,total:ids.length};}
+function allStats(){var d=0,t=0; BLOCKS.forEach(function(b){var s=blockStats(b); d+=s.done; t+=s.total;}); return {done:d,total:t};}
+function weeksDone(){var d=0; BLOCKS.forEach(function(b){for(var i=1;i<=b.weeks.length;i++) if(state.done[b.id+"w"+i]) d++;}); return d;}
+function totalWeeks(){var t=0; BLOCKS.forEach(function(b){t+=b.weeks.length;}); return t;}
+function weekNumber(b,w){var n=0; for(var i=0;i<BLOCKS.length;i++){ if(BLOCKS[i]===b) return n+w+1; n+=BLOCKS[i].weeks.length; } return 0;}
+function nextStep(){
+  for(var i=0;i<BLOCKS.length;i++){var b=BLOCKS[i];
+    for(var w=0;w<b.weeks.length;w++) if(!state.done[b.id+"w"+(w+1)]) return {b:b,w:w};
+    if(!state.done[b.id+"e"]) return {b:b,w:-1};
+  }
+  return null;
+}
+function pace(){
+  if(!state.start) return null;
+  var days = diffDays(state.start, today());
+  if(days < 0) return {before:true, days:-days};
+  var planned = Math.min(totalWeeks(), Math.floor(days/7)+1);
+  return {planned:planned, diff:weeksDone() - (planned-1)};
+}
+function acc(dom,type){var q=0,ok=0; state.ses.forEach(function(s){ if(s.q>0 && (!dom||s.dom===dom) && (!type||s.type===type)){q+=s.q; ok+=s.ok;} }); return {q:q, ok:ok, p:q?Math.round(100*ok/q):null};}
+function mins(from,to){var m=0; state.ses.forEach(function(s){ if((!from||s.d>=from) && (!to||s.d<=to)) m+=s.min; }); return m;}
+function cls(p){return p==null ? "" : p>=TARGET ? "good" : p>=60 ? "mid" : "low";}
+function sims(){return state.ses.filter(function(s){return s.type==="S" && s.q>0;}).sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:b.id-a.id;});}
+
+/* ---------- render ---------- */
+function renderChrome(){
+  var tabs = '<a class="tab" href="#resumen" data-v="resumen">Resumen</a>', segs = "", labels = "";
+  BLOCKS.forEach(function(b){
+    tabs += '<a class="tab" href="#bloque-'+b.n+'" data-v="bloque-'+b.n+'">Bloque '+b.n+'</a>';
+    var n = milestones(b).length;
+    segs += '<div class="seg" style="flex:'+n+'"><i id="seg-'+b.id+'"></i></div>';
+    labels += '<span style="flex:'+n+'">B'+b.n+'</span>';
+  });
+  tabs += '<a class="tab" href="#practica" data-v="practica">Práctica</a><a class="tab" href="#apoyo" data-v="apoyo">Apoyo</a>';
+  document.getElementById("tabs").innerHTML = tabs;
+  document.getElementById("segs").innerHTML = segs;
+  document.getElementById("seglabels").innerHTML = labels;
+}
+function refreshStats(){
+  var a = allStats();
+  document.getElementById("gdone").textContent = a.done;
+  document.getElementById("gtotal").textContent = a.total;
+  document.getElementById("gpct").textContent = Math.round(100*a.done/a.total) + " %";
+  BLOCKS.forEach(function(b){
+    var s = blockStats(b), pct = (100*s.done/s.total) + "%";
+    var el = document.getElementById("seg-"+b.id); if(el) el.style.width = pct;
+    var bar = document.getElementById("bar-"+b.id); if(bar) bar.style.width = pct;
+    var m = document.getElementById("meta-"+b.id); if(m) m.textContent = s.done + " de " + s.total;
+  });
+}
+function paceText(pc){
+  var t = "";
+  if(!pc) t = "Pon tu fecha de inicio para comparar tu avance con el calendario de 12 semanas.";
+  else if(pc.before) t = "El plan empieza en <b>"+pc.days+" día"+(pc.days===1?"":"s")+"</b>.";
+  else {
+    t = "Por calendario vas en la <b>semana "+pc.planned+" de "+totalWeeks()+"</b>. ";
+    if(pc.diff > 0) t += "Llevas <b>"+pc.diff+" semana"+(pc.diff===1?"":"s")+" de ventaja</b>.";
+    else if(pc.diff < 0) t += "Tienes <b>"+(-pc.diff)+" semana"+(pc.diff===-1?"":"s")+" de atraso</b>.";
+    else t += "Vas <b>al día</b>.";
+  }
+  if(state.exam){
+    var d = diffDays(today(), state.exam);
+    t += d > 0 ? " Faltan <b>"+d+" día"+(d===1?"":"s")+"</b> para el examen." : d === 0 ? " <b>Hoy es el examen.</b>" : " Examen presentado el "+short(state.exam)+".";
+  }
+  var td = today(), dow = (parse(td).getDay()+6)%7, ws = addDays(td,-dow), wm = mins(ws, addDays(ws,6));
+  t += " Esta semana llevas <b>"+hrs(wm)+" de "+String(state.goal).replace(".",",")+" h</b>.";
+  return t;
+}
+function domRows(){
+  var h = "";
+  DOMS.slice(0,3).forEach(function(d){
+    var a = acc(d[0]);
+    h += '<div class="dom"><div class="meta"><span>'+d[1]+'</span><b class="'+cls(a.p)+'">'+(a.p==null ? "sin datos" : a.p+" % · "+a.q+" preg.")+'</b></div><div class="bar"><i style="width:'+(a.p||0)+'%"></i><u style="left:'+TARGET+'%"></u></div></div>';
+  });
+  return h;
+}
+function readiness(){
+  var full = sims().filter(function(s){return s.q>=150;}).slice(0,2);
+  var ready = full.length===2 && full.every(function(s){return 100*s.ok/s.q >= TARGET;});
+  return ready ? '<span class="pill done">Listo para presentar</span>' : '<span class="pill">Faltan 2 simulacros completos ≥ '+TARGET+' %</span>';
+}
+function renderResumen(){
+  var h = "", nx = nextStep();
+  if(nx){
+    var title = nx.w >= 0 ? "Semana "+weekNumber(nx.b,nx.w)+": "+nx.b.weeks[nx.w][0] : "Entregable del bloque";
+    var body = nx.w >= 0 ? nx.b.weeks[nx.w][2] : nx.b.deliv;
+    h += '<section class="card next stack"><span class="eyebrow">Siguiente paso · Bloque '+nx.b.n+'</span><h2>'+esc(title)+'</h2><p>'+esc(body)+'</p><div><a class="btn" href="#bloque-'+nx.b.n+'">Ir al bloque '+nx.b.n+'</a></div></section>';
+  } else {
+    h += '<section class="card next stack"><span class="eyebrow">Plan completo</span><h2>Terminaste los 5 bloques</h2><p>Cerraste las 12 semanas y los 5 entregables.</p></section>';
+  }
+  h += '<section class="card stack"><h3>Ritmo</h3><div class="row"><label class="field" for="start">Fecha de inicio del plan<input type="date" id="start" value="'+esc(state.start)+'"></label><label class="field" for="exam">Fecha del examen<input type="date" id="exam" value="'+esc(state.exam)+'"></label></div><p class="pace" id="pace">'+paceText(pace())+'</p></section>';
+  h += '<section class="stack"><h3>Bloques</h3><div class="blocks">';
+  BLOCKS.forEach(function(b){
+    var ent = state.done[b.id+"e"];
+    h += '<a class="card bcard" href="#bloque-'+b.n+'"><span class="tag">BLOQUE '+b.n+' · '+esc(b.dur)+'</span><span class="name">'+esc(b.name)+'</span><div class="bar"><i id="bar-'+b.id+'"></i></div><div class="meta"><span id="meta-'+b.id+'"></span><span class="pill'+(ent?' done':'')+'">'+(ent?'Entregable listo':'Entregable pendiente')+'</span></div></a>';
+  });
+  h += '</div></section>';
+  var g = acc();
+  h += '<section class="card stack"><h3>Aciertos por dominio</h3><p class="pace">Global: <b class="'+cls(g.p)+'">'+(g.p==null?"sin datos":g.p+" %")+'</b> en '+g.q+' preguntas. La marca es la meta de '+TARGET+' %.</p>'+domRows()+'<div class="row" style="align-items:center">'+readiness()+'<a class="btn ghost" href="#practica">Registrar sesión</a></div></section>';
+  h += '<section class="card stack"><h3>Rutina semanal</h3><p>10 a 12 horas por semana, repartidas así:</p><div class="mix" role="img" aria-label="50 % preguntas, 30 % curso y lectura, 20 % repaso de errores"><span class="a">50 %</span><span class="b">30 %</span><span class="c">20 %</span></div><div class="legend"><span>50 % preguntas situacionales</span><span>30 % curso y lectura</span><span>20 % repaso de errores</span></div><ul class="plain"><li>Estudia por el ECO, no por el PMBOK: el ECO define qué se evalúa.</li><li>No pases al siguiente bloque sin terminar el entregable.</li><li>Nunca cierres una sesión de preguntas sin leer la explicación de cada fallo.</li></ul></section>';
+  return h;
+}
+function renderBlock(b){
+  var h = '<section class="stack"><span class="eyebrow">Bloque '+b.n+' · '+esc(b.dur)+'</span><h2>'+esc(b.name)+'</h2><p>'+esc(b.goal)+'</p><p class="books"><b>Material:</b> '+esc(b.books)+'</p><div class="bar"><i id="bar-'+b.id+'"></i></div><div class="meta"><span id="meta-'+b.id+'"></span><span>hitos del bloque</span></div></section>';
+  h += '<section class="card"><div class="weeks">';
+  b.weeks.forEach(function(w,i){
+    var id = b.id+"w"+(i+1), on = state.done[id];
+    h += '<label class="week'+(on?' on':'')+'" for="c-'+id+'"><input type="checkbox" id="c-'+id+'" data-id="'+id+'"'+(on?' checked':'')+'><span class="wk">S'+weekNumber(b,i)+'</span><span class="wbody"><span class="wtitle">'+esc(w[0])+'</span><span class="wstudy">'+esc(w[1])+'</span><span class="wprob"><small>'+esc(b.probLabel)+'</small>'+esc(w[2])+'</span></span></label>';
+  });
+  h += '</div></section>';
+  var eid = b.id+"e", eon = state.done[eid];
+  h += '<section class="card deliv stack'+(eon?' on':'')+'"><h3>Entregable</h3><label class="check'+(eon?' on':'')+'" for="c-'+eid+'"><input type="checkbox" id="c-'+eid+'" data-id="'+eid+'"'+(eon?' checked':'')+'><span>'+esc(b.deliv)+'</span></label>';
+  if(b.dom){ var a = acc(b.dom); h += '<p class="books">Aciertos registrados en este dominio: <b class="'+cls(a.p)+'">'+(a.p==null?"sin datos":a.p+" % en "+a.q+" preguntas")+'</b></p>'; }
+  h += '</section>';
+  h += '<section class="card stack"><h3>'+esc(b.checkTitle)+'</h3><div>';
+  b.checks.forEach(function(q,i){
+    var id = b.id+"q"+(i+1), on = state.done[id];
+    h += '<label class="check'+(on?' on':'')+'" for="c-'+id+'"><input type="checkbox" id="c-'+id+'" data-id="'+id+'"'+(on?' checked':'')+'><span>'+esc(q)+'</span></label>';
+  });
+  h += '</div></section>';
+  h += '<section class="card stack"><h3>Puntos clave</h3><div>';
+  KEY.forEach(function(k){
+    if(k[0] !== b.id) return;
+    h += '<details class="kp"><summary>'+esc(k[1])+'</summary><ul class="plain">';
+    k[2].forEach(function(p){h += '<li>'+esc(p)+'</li>';});
+    h += '</ul></details>';
+  });
+  h += '</div></section>';
+  h += '<section class="card stack"><h3>Notas del bloque</h3><label class="field" for="notes-'+b.id+'">Dudas, errores frecuentes y reglas que te llevas<textarea id="notes-'+b.id+'" data-notes="'+b.id+'" placeholder="Por ejemplo: fallé 3 preguntas de control de cambios por implementar antes de aprobar.">'+esc(state.notes[b.id]||"")+'</textarea></label></section>';
+  var prev = b.n > 1 ? '<a class="btn ghost" href="#bloque-'+(b.n-1)+'">Bloque '+(b.n-1)+'</a>' : '<a class="btn ghost" href="#resumen">Resumen</a>';
+  var next = b.n < BLOCKS.length ? '<a class="btn ghost" href="#bloque-'+(b.n+1)+'">Bloque '+(b.n+1)+'</a>' : '<a class="btn ghost" href="#practica">Práctica</a>';
+  return h + '<div class="foot">'+prev+next+'</div>';
+}
+function trend(){
+  var d = state.ses.filter(function(s){return s.q>0;}).sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:a.id-b.id;}).slice(-15);
+  if(d.length < 2) return '<p class="books">Registra al menos dos sesiones con preguntas para ver la tendencia.</p>';
+  var W=320, H=120, px=function(i){return 8+i*(W-16)/(d.length-1);}, py=function(p){return H-10-(p/100)*(H-20);};
+  var pts = d.map(function(s,i){return px(i).toFixed(1)+","+py(100*s.ok/s.q).toFixed(1);}).join(" "), c = "";
+  d.forEach(function(s,i){c += '<circle cx="'+px(i).toFixed(1)+'" cy="'+py(100*s.ok/s.q).toFixed(1)+'" r="'+(s.type==="S"?4.5:3)+'" fill="var(--done)"/>';});
+  return '<svg class="tr" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Tendencia de aciertos"><line x1="0" x2="'+W+'" y1="'+py(TARGET)+'" y2="'+py(TARGET)+'" stroke="var(--accent)" stroke-dasharray="4 4" stroke-width="1"/><polyline points="'+pts+'" fill="none" stroke="var(--done)" stroke-width="2"/>'+c+'</svg><p class="books">Últimas '+d.length+' sesiones. Línea punteada: meta de '+TARGET+' %. Puntos grandes: simulacros.</p>';
+}
+function opts(l,sel){return l.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===sel?' selected':'')+'>'+x[1]+'</option>';}).join("");}
+function renderPractica(){
+  var h = '<section class="stack"><span class="eyebrow">Preguntas, simulacros y horas</span><h2>Práctica</h2><p>Registra cada sesión. Con eso se calculan tus aciertos por dominio, las horas de la semana y si estás listo para presentar.</p></section>';
+  h += '<section class="card next stack"><h3>Registrar sesión</h3><div class="row"><label class="field" for="f-d">Fecha<input type="date" id="f-d" value="'+today()+'"></label><label class="field" for="f-t">Tipo<select id="f-t">'+opts(TYPES,"Q")+'</select></label><label class="field" for="f-dom">Dominio<select id="f-dom">'+opts(DOMS,"MX")+'</select></label></div><div class="row"><label class="field" for="f-min">Minutos<input type="number" inputmode="numeric" id="f-min" min="0" placeholder="90"></label><label class="field" for="f-q">Preguntas<input type="number" inputmode="numeric" id="f-q" min="0" placeholder="0"></label><label class="field" for="f-ok">Correctas<input type="number" inputmode="numeric" id="f-ok" min="0" placeholder="0"></label></div><label class="field" for="f-n">Nota (opcional)<input type="text" id="f-n" maxlength="80" placeholder="Fuente, tema o qué fallaste"></label><p class="err" id="f-e" role="alert"></p><div><button class="btn" type="button" data-act="saveses">Guardar sesión</button></div></section>';
+  h += '<section class="card stack"><h3>Aciertos por dominio</h3>'+domRows()+'<div>'+readiness()+'</div></section>';
+  h += '<section class="card stack"><h3>Tendencia</h3>'+trend()+'</section>';
+  var l = state.ses.slice().sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:b.id-a.id;});
+  h += '<section class="card stack"><h3>Sesiones · '+l.length+'</h3><p class="books">Total estudiado: '+hrs(mins())+' h.</p><div>';
+  if(!l.length) h += '<p class="books">Sin sesiones todavía.</p>';
+  l.slice(0,80).forEach(function(s){
+    var p = s.q>0 ? Math.round(100*s.ok/s.q) : null;
+    h += '<div class="ses"><div class="g"><div class="d">'+short(s.d).toUpperCase()+' · '+nameOf(TYPES,s.type).toUpperCase()+'</div><div>'+nameOf(DOMS,s.dom)+(s.min?' · '+s.min+' min':'')+(s.q?' · '+s.ok+'/'+s.q:'')+(s.note?' · '+esc(s.note):'')+'</div></div>'+(p!=null?'<b class="p '+cls(p)+'">'+p+' %</b>':'')+'<button class="x" type="button" data-act="delses" data-k="'+s.id+'" aria-label="Eliminar sesión">×</button></div>';
+  });
+  return h + '</div></section>';
+}
+function renderApoyo(){
+  var h = '<section class="stack"><span class="eyebrow">Referencia rápida</span><h2>Apoyo</h2><p>Fórmulas, trámites con PMI y copia de seguridad de tus datos.</p></section>';
+  h += '<section class="card stack"><h3>Fórmulas</h3><table class="f">';
+  FORM.forEach(function(f){h += '<tr><td>'+f[0]+'</td><td>'+f[1]+'<small>'+f[2]+'</small></td></tr>';});
+  h += '</table></section>';
+  h += '<section class="card stack"><h3>Trámites con PMI</h3><div>';
+  TRAM.forEach(function(t,i){var id="tr"+i, on=state.done[id]; h += '<label class="check'+(on?' on':'')+'" for="c-'+id+'"><input type="checkbox" id="c-'+id+'" data-id="'+id+'"'+(on?' checked':'')+'><span>'+esc(t)+'</span></label>';});
+  h += '</div></section>';
+  h += '<section class="card stack"><h3>El examen</h3><ul class="plain"><li>180 preguntas (170 puntúan) en 240 minutos, con dos pausas de 10 minutos.</li><li>Personas 33 %, Proceso 41 %, Entorno de negocio 26 %.</li><li>Cerca de 40 % predictivo y 60 % ágil o híbrido.</li><li>Casos de estudio con varias preguntas y preguntas con gráficos.</li><li>Ritmo objetivo: '+PACE_S+' segundos por pregunta.</li></ul></section>';
+  h += '<section class="card stack"><h3>Ajustes y copia</h3><div class="row"><label class="field" for="goal">Meta de horas por semana<input type="number" inputmode="decimal" id="goal" min="1" max="60" value="'+esc(state.goal)+'"></label></div><div class="row"><button class="btn ghost" type="button" data-act="export">Exportar copia</button><button class="btn ghost" type="button" data-act="import">Importar copia</button><button class="btn danger" type="button" data-act="reset">Borrar datos</button></div><input type="file" id="imp" accept="application/json,.json" hidden><p class="books">Ruta PMP v'+VERSION+'. Los datos se guardan solo en este dispositivo; exporta una copia de vez en cuando.</p></section>';
+  return h;
+}
+function render(){
+  var m = /^bloque-([1-5])$/.exec(view), main = document.getElementById("main");
+  main.innerHTML = m ? renderBlock(BLOCKS[+m[1]-1]) : view === "practica" ? renderPractica() : view === "apoyo" ? renderApoyo() : renderResumen();
+  var tabs = document.querySelectorAll(".tab");
+  for(var i=0;i<tabs.length;i++){
+    if(tabs[i].getAttribute("data-v") === view){ tabs[i].setAttribute("aria-current","page"); if(tabs[i].scrollIntoView) tabs[i].scrollIntoView({block:"nearest",inline:"nearest"}); }
+    else tabs[i].removeAttribute("aria-current");
+  }
+  refreshStats();
+}
+function route(){
+  var hsh = (location.hash||"").replace(/^#/,"");
+  var nv = /^(bloque-[1-5]|practica|apoyo)$/.test(hsh) ? hsh : "resumen";
+  var changed = nv !== view;
+  view = nv; render();
+  if(changed) window.scrollTo(0,0);
+}
+
+/* ---------- eventos ---------- */
+function val(id){return document.getElementById(id).value;}
+function saveSes(){
+  var q = Math.max(0,parseInt(val("f-q"),10)||0), ok = Math.max(0,parseInt(val("f-ok"),10)||0), m = Math.max(0,parseInt(val("f-min"),10)||0), d = val("f-d"), e = "";
+  if(!isDate(d)) e = "Indica la fecha.";
+  else if(ok > q) e = "Las correctas no pueden superar las preguntas.";
+  else if(!q && !m) e = "Indica minutos o preguntas.";
+  if(e){ document.getElementById("f-e").textContent = e; return; }
+  state.ses.push({id:Date.now(), d:d, type:val("f-t"), dom:val("f-dom"), min:m, q:q, ok:ok, note:val("f-n").trim()});
+  saveLocal(); render();
+}
+function exportData(){
+  var txt = JSON.stringify(state,null,1), fn = "ruta-pmp-"+today()+".json";
+  try{ var file = new File([txt], fn, {type:"application/json"}); if(navigator.canShare && navigator.canShare({files:[file]})){ navigator.share({files:[file], title:"Copia Ruta PMP"}).catch(function(){}); return; } }catch(e){}
+  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt],{type:"application/json"})); a.download = fn; document.body.appendChild(a); a.click(); a.remove();
+}
+document.addEventListener("click", function(e){
+  var a = e.target.closest && e.target.closest("[data-act]"); if(!a) return;
+  var act = a.getAttribute("data-act"), k = a.getAttribute("data-k");
+  if(act === "saveses") saveSes();
+  else if(act === "delses"){ if(confirm("¿Eliminar esta sesión?")){ state.ses = state.ses.filter(function(s){return String(s.id) !== k;}); saveLocal(); render(); } }
+  else if(act === "export") exportData();
+  else if(act === "import") document.getElementById("imp").click();
+  else if(act === "reset"){ if(confirm("Se borrará todo tu avance en este dispositivo. ¿Continuar?")){ state = blank(); saveLocal(); render(); } }
+});
+document.addEventListener("change", function(e){
+  var t = e.target;
+  if(t.matches && t.matches("input[type=checkbox][data-id]")){
+    var id = t.getAttribute("data-id");
+    if(t.checked) state.done[id] = true; else delete state.done[id];
+    var lab = t.closest("label"); if(lab) lab.classList.toggle("on", t.checked);
+    var dv = t.closest(".deliv"); if(dv) dv.classList.toggle("on", t.checked);
+    refreshStats(); saveLocal();
+  } else if(t.id === "start" || t.id === "exam"){
+    state[t.id] = isDate(t.value) ? t.value : "";
+    var p = document.getElementById("pace"); if(p) p.innerHTML = paceText(pace());
+    saveLocal();
+  } else if(t.id === "goal"){
+    var g = parseFloat(t.value); state.goal = g >= 1 && g <= 60 ? g : 11; t.value = state.goal; saveLocal();
+  } else if(t.id === "imp" && t.files && t.files[0]){
+    var r = new FileReader();
+    r.onload = function(){
+      try{ var d = JSON.parse(r.result); if(!d || typeof d !== "object" || !Array.isArray(d.ses)) throw 0;
+        if(confirm("Se reemplazarán los datos actuales por los de la copia. ¿Continuar?")){ state = clean(d); saveLocal(); render(); }
+      }catch(x){ alert("El archivo no es una copia válida de Ruta PMP."); }
+    };
+    r.readAsText(t.files[0]); t.value = "";
+  }
+});
+document.addEventListener("input", function(e){
+  var t = e.target, b = t.getAttribute && t.getAttribute("data-notes");
+  if(b){ if(t.value) state.notes[b] = t.value; else delete state.notes[b]; saveLocal(); }
+});
+window.addEventListener("hashchange", route);
+
+loadLocal();
+saveLocal();
+renderChrome();
+route();
+if("serviceWorker" in navigator && location.protocol === "https:"){ navigator.serviceWorker.register("./sw.js").catch(function(){}); }
+</script>
+</body>
+</html>

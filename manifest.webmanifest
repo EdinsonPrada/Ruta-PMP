@@ -1,0 +1,16 @@
+{
+  "name": "Ruta PMP",
+  "short_name": "Ruta PMP",
+  "description": "Seguimiento del plan de estudio para el examen PMP (ECO julio 2026)",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef1f2",
+  "theme_color": "#14262e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
